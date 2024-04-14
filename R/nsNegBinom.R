@@ -1,50 +1,43 @@
-#' Neutrosophic Geometric Distribution
+#' Neutrosophic Negative Binomial Distribution
 #'
 #' Density, distribution function, quantile function and random
-#' generation for the neutrosophic Geometric distribution with
-#' parameter \code{prob} = \eqn{p_N}.
+#' generation for the neutrosophic Negative Binomial distribution with
+#' parameters \code{size} = \eqn{r_N} and \code{prob} = \eqn{p_N}.
 #'
-#' The neutrosophic Geometric distribution with parameter \eqn{p_N}
+#' The neutrosophic negative binomial distribution with parameters \eqn{r_N} and \eqn{p_N}
 #' has the density
-#' \deqn{f_X(x)=p_N\left(1-p_N\right)^x}
-#' for \eqn{p_N \in (p_L, p_U)} which must be \eqn{0<p_N<1}
+#' \deqn{\left(\begin{array}{c} r_N+x-1 \\ x \end{array}\right) p_N^{r_N}\left(1-p_N\right)^{x}}
+#' for \eqn{r_N \in \{1, 2, \ldots\}} and \eqn{p_N \in (p_L, p_U)} which must be \eqn{0<p_N<1}
 #' and \eqn{x \in \{0, 1, 2, \ldots\}}.
 #'
-#' @name Neutrosophic Geometric
+#' @name Neutrosophic Negative Binomial
 #' @param x a vector or matrix of observations for which the pdf needs to be computed.
 #' @param q a vector or matrix of quantiles for which the cdf needs to be computed.
 #' @param p a vector or matrix of probabilities for which the quantile needs to be computed.
 #' @param n number of random values to be generated.
-#' @param prob probability of success on each trial, \code{prob}\eqn{\in (0,1)}.
+#' @param size number of trials (zero or more), which must be a positive interval.
+#' @param prob probability of success on each trial, \eqn{0 < \code{prob} < 1}.
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #' \eqn{P(X \leq x)}; otherwise, \eqn{P(X >x)}.
 #'
 #' @return
-#'  \code{dnsGeom} gives the probability mass function
+#'  \code{dnsNegBinom} gives the probability mass function
 #'
-#'  \code{pnsGeom} gives the distribution function
+#'  \code{pnsNegBinom} gives the distribution function
 #'
-#'  \code{qnsGeom} gives the quantile function
+#'  \code{qnsNegBinom} gives the quantile function
 #'
-#'  \code{rnsGeom} generates random variables from the Geometric Distribution.
-#'
+#'  \code{rnsNegBinom} generates random variables from the Negative Binomial Distribution.
 #' @references
-#' Granados, C. (2022). Some discrete neutrosophic distributions with
-#' neutrosophic parameters based on neutrosophic random variables.
-#' \emph{Hacettepe Journal of Mathematics and Statistics}, 51(5), 1442-1457.
-#'
-#' @importFrom stats runif dgeom pgeom qgeom
-#'
+#'        Granados, C. (2022).
+#'        Some discrete neutrosophic distributions with neutrosophic parameters based on neutrosophic random variables.
+#'         \emph{Hacettepe Journal of Mathematics and Statistics}, 51(5), 1442-1457.
+#' @importFrom stats runif dnbinom pnbinom qnbinom
 #' @examples
-#' # One person participates each week with a ticket in a lottery game, where
-#' # the probability of winning the first prize is (10^(-8), 10^(-6)).
-#' # Probability of one persons wins at the fifth year?
-#'
-#' dnsGeom(x = 5, prob = c(1e-8, 1e-6))
-#'
+#' dnsNegBinom(x = 1, size = 2, prob = c(0.5, 0.6))
 #' @export
-dnsGeom <- function(x, prob) {
-  if (any(prob <= 0) || any(prob > 1) || any(x < 0)) {
+dnsNegBinom <- function(x, size, prob) {
+  if (any(size < 1) || any(prob <= 0) || any(prob > 1) || any(x < 0)) {
     stop(message = "Arguments are incompatible.")
   }
 
@@ -52,6 +45,7 @@ dnsGeom <- function(x, prob) {
     stop(message = "Warning: x should be a positive integer.")
   }
 
+  size <- rep(size, length.out = 2)
   prob <- rep(prob, length.out = 2)
 
   if (is.vector(x) || ncol(x) == 1) {
@@ -64,25 +58,25 @@ dnsGeom <- function(x, prob) {
 
   pdf <- matrix(NA, nrow = nrow(x), ncol = 2)
   for (i in 1:2) {
-    pdf[, i] <- stats::dgeom(x[, i], prob = prob[i])
+    pdf[, i] <- stats::dnbinom(x[, i], size = size[i], prob = prob[i])
   }
 
   return(pdf)
 }
-#' @name Neutrosophic Geometric
+#' @name Neutrosophic Negative Binomial
 #' @examples
-#' # Probability of one persons wins after 10 years?
-#' pnsGeom(q = 10, prob = c(1e-8, 1e-6))
-#' pnsGeom(q = 10, prob = c(1e-8, 1e-6), lower.tail = FALSE)
+#' pnsNegBinom(q = 1, size = 2, prob = c(0.5, 0.6))
 #' @export
-pnsGeom <- function(q, prob, lower.tail = TRUE) {
-  if (any(prob <= 0) || any(prob > 1) || any(q < 0)) {
+
+pnsNegBinom <- function(q, size, prob, lower.tail = TRUE) {
+  if (any(size < 1) || any(prob <= 0) || any(prob > 1) || any(q < 0)) {
     stop(message = "Arguments are incompatible.")
   }
   if (any(q < 0) && any(q - floor(q) == 0)) {
     stop(message = "Warning: q should be a  positive integer.")
   }
 
+  size <- rep(size, length.out = 2)
   prob <- rep(prob, length.out = 2)
 
   if (is.vector(q) || ncol(q) == 1) {
@@ -94,28 +88,29 @@ pnsGeom <- function(q, prob, lower.tail = TRUE) {
 
   cdf <- matrix(NA, nrow = nrow(q), ncol = 2)
   for (i in 1:2) {
-    cdf[, i] <- stats::pgeom(q[, i], prob = prob[i])
+    cdf[, i] <- stats::pnbinom(q[, i], size = size[i], prob = prob[i])
   }
+
   if (!lower.tail) {
     cdf <- 1 - cdf
   }
 
   return(cdf)
 }
-#' @name Neutrosophic Geometric
+#' @name Neutrosophic Negative Binomial
 #' @examples
-#' # Calculate the quantiles
-#' qnsGeom(p = c(0.25, 0.5, 0.75), prob = c(1e-8, 1e-6))
+#' qnsNegBinom(p = c(0.25, 0.5, 0.75), size = 2, prob = c(0.5, 0.6))
 #' @export
-qnsGeom <- function(p, prob) {
+qnsNegBinom <- function(p, size, prob) {
   if (any(p < 0) || any(p > 1)) {
     stop(message = "Warning: p should be in the interval [0,1].")
   }
 
-  if (any(prob <= 0) || any(prob > 1)) {
+  if (any(size < 1) || any(prob <= 0) || any(prob > 1)) {
     stop(message = "Arguments are incompatible.")
   }
 
+  size <- rep(size, length.out = 2)
   prob <- rep(prob, length.out = 2)
 
   if (is.vector(p) || ncol(p) == 1) {
@@ -126,25 +121,25 @@ qnsGeom <- function(p, prob) {
   }
   quantiles <- matrix(NA, nrow = nrow(p), ncol = 2)
   for (i in 1:2) {
-    quantiles[, i] <- stats::qgeom(p[, i], prob = prob[i])
+    quantiles[, i] <- stats::qnbinom(p[, i], size = size[i], prob = prob[i])
   }
 
   return(quantiles)
 }
 
-#' @name Neutrosophic Geometric
+#' @name Neutrosophic Negative Binomial
 #' @examples
-#' # Simulate 10 numbers
-#' rnsGeom(n = 10, prob = c(1e-8, 1e-6))
+#' rnsNegBinom(n = 10, size = 2, prob = c(0.6, 0.6))
 #' @export
-rnsGeom <- function(n, prob) {
-  if (any(prob <= 0) || any(prob > 1)) {
+rnsNegBinom <- function(n, size, prob) {
+  if (any(size < 1) || any(prob <= 0) || any(prob > 1)) {
     stop(message = "Arguments are incompatible.")
   }
 
+  size <- rep(size, length.out = 2)
   prob <- rep(prob, length.out = 2)
 
-  X <- qnsGeom(runif(n), prob)
+  X <- qnsNegBinom(runif(n), size, prob)
   condition <- X[, 1] > X[, 2]
   X[condition, 1:2] <- X[condition, 2:1]
 

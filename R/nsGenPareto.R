@@ -1,19 +1,18 @@
-#' Neutrosophic Gamma Distribution
+#' Neutrosophic Generalized Pareto Distribution
 #'
 #' Density, distribution function, quantile function and random generation for
-#' the neutrosophic gamma distribution with parameter \code{shape} = \eqn{\alpha_N}
-#' and \code{scale}=\eqn{\lambda_N}.
+#' the neutrosophic generalized pareto distribution with parameters \code{shape} = \eqn{\alpha_N}
+#' and \code{scale}=\eqn{\beta_N}.
 #'
-#' The neutrosophic gamma distribution with parameters \eqn{\alpha_N} and
-#' \eqn{\lambda_N} has density
-#' \deqn{f_N(x)=\frac{1}{\Gamma(\alpha_N) \lambda_N^{\alpha_N}} x^{\alpha_N-1} \exp\{-\left(x / \lambda_N\right)\}}
+#' The neutrosophic generalized pareto distribution with parameters \eqn{\alpha_N} and
+#' \eqn{\beta_N} has density
+#' \deqn{f_N(x)=\frac{1}{\beta_N}\left(1+\frac{\alpha_N x_N}{\beta_N} \right)^{-\frac{1}{\alpha_N}-1}}
 #' for \eqn{x \ge 0}, \eqn{\alpha_N \in (\alpha_L, \alpha_U)}, the shape
 #' parameter which must be a positive interval and
-#' \eqn{\lambda_N \in (\lambda_L, \lambda_U)}, the scale parameter which
-#' must be a positive interval. Here, \eqn{\Gamma(\cdot)} is gamma
-#' function implemented by \code{\link{gamma}}.
+#' \eqn{\beta_N \in (\beta_L, \beta_U)}, the scale parameter which
+#' must be a positive interval.
 #'
-#' @name Neutrosophic Gamma
+#' @name Neutrosophic Generalized Pareto
 #' @param x a vector or matrix of observations for which the pdf needs to be computed.
 #' @param q a vector or matrix of quantiles for which the cdf needs to be computed.
 #' @param p a vector or matrix of probabilities for which the quantile needs to be computed.
@@ -24,34 +23,31 @@
 #' \eqn{P(X \leq x)}; otherwise, \eqn{P(X >x)}.
 #'
 #' @return
-#'  \code{dnsGamma} gives the density function
+#'  \code{dnsGenPareto} gives the density function
 #'
-#'  \code{pnsGamma} gives the distribution function
+#'  \code{pnsGenPareto} gives the distribution function
 #'
-#'  \code{qnsGamma} gives the quantile function
+#'  \code{qnsGenPareto} gives the quantile function
 #'
-#'  \code{rnsGamma} generates random variables from the neutrosophic gamma distribution.
-#'
+#'  \code{rnsGenPareto} generates random variables from the neutrosophic generalized pareto distribution.
 #' @references
-#'    Khan, Z., Al-Bossly, A., Almazah, M. M. A., and Alduais, F. S. (2021).
-#'    On statistical development of neutrosophic gamma distribution with
-#'    applications to complex data analysis, \emph{Complexity}, 2021, Article ID 3701236.
-#'
+#'    Eassa, N. I., Zaher, H. M., & El-Magd, N. A. A. (2023).
+#'    Neutrosophic Generalized Pareto Distribution, \emph{Mathematics and Statistics},
+#'    11(5), 827--833.
 #' @importFrom stats runif dgamma pgamma qgamma
-#'
 #' @examples
 #' data(remission)
-#' dnsGamma(x = remission, shape = c(1.1884, 1.1896), scale = c(7.6658, 7.7796))
+#' dnsGenPareto(x = remission, shape = c(1.1884, 1.1896), scale = c(7.6658, 7.7796))
 #'
-#' pnsGamma(q = 20, shape = c(1.1884, 1.1896), scale = c(7.6658, 7.7796))
+#' pnsGenPareto(q = 20, shape = c(1.1884, 1.1896), scale = c(7.6658, 7.7796))
 #'
 #' # Calculate quantiles
-#' qnsGamma(p = c(0.25, 0.5, 0.75), shape = c(1.1884, 1.1896), scale = c(7.6658, 7.7796))
+#' qnsGenPareto(p = c(0.25, 0.5, 0.75), shape = c(1.1884, 1.1896), scale = c(7.6658, 7.7796))
 #'
 #' # Simulate 10 numbers
-#' rnsGamma(n = 10, shape = c(1.1884, 1.1896), scale = c(7.6658, 7.7796))
+#' rnsGenPareto(n = 10, shape = c(1.1884, 1.1896), scale = c(7.6658, 7.7796))
 #' @export
-dnsGamma <- function(x, shape, scale) {
+dnsGenPareto <- function(x, shape, scale) {
   if (any(shape <= 0) || any(scale <= 0) || any(x < 0)) {
     stop(message = "Arguments are incompatible.")
   }
@@ -69,14 +65,14 @@ dnsGamma <- function(x, shape, scale) {
 
   pdf <- matrix(NA, nrow = nrow(x), ncol = 2)
   for (i in 1:2) {
-    pdf[, i] <- stats::dgamma(x[, i], shape = shape[i], scale = scale[i])
+    pdf[, i] <- (1 / scale[i]) * (1 + (shape[i] * x[,i]) / scale[i])^(-1 / shape[i] - 1)
   }
 
   return(pdf)
 }
-#' @name Neutrosophic Gamma
+#' @name Neutrosophic Generalized Pareto
 #' @export
-pnsGamma <- function(q, shape, scale, lower.tail = TRUE) {
+pnsGenPareto <- function(q, shape, scale, lower.tail = TRUE) {
   if (any(shape <= 0) || any(scale <= 0) || any(q < 0)) {
     stop(message = "incompatible arguments.")
   }
@@ -91,21 +87,23 @@ pnsGamma <- function(q, shape, scale, lower.tail = TRUE) {
     stop(message = "Arguments are incompatible.")
   }
 
+
+
   cdf <- matrix(NA, nrow = nrow(q), ncol = 2)
   for (i in 1:2) {
-    cdf[, i] <- stats::pgamma(q[, i], shape = shape[i], scale = scale[i])
+    cdf[, i] <- 1 - (1 + (shape[i] * q[,i]) / scale[i])^(-1 / shape[i])
   }
 
   if (!lower.tail) {
     cdf <- 1 - cdf
   }
 
-    return(cdf)
+  return(cdf)
 }
 
-#' @name Neutrosophic Gamma
+#' @name Neutrosophic Generalized Pareto
 #' @export
-qnsGamma <- function(p, shape, scale) {
+qnsGenPareto <- function(p, shape, scale) {
   if (any(p < 0) || any(p > 1)) {
     stop(message = "Warning: p should be in the interval [0,1].")
   }
@@ -125,15 +123,15 @@ qnsGamma <- function(p, shape, scale) {
   }
   quantiles <- matrix(NA, nrow = nrow(p), ncol = 2)
   for (i in 1:2) {
-    quantiles[, i] <- stats::qgamma(p[, i], shape = shape[i], scale = scale[i])
+    quantiles[, i] <- scale[i] / shape[i] * ((1 - p[, i])^(-shape[i]) - 1)
   }
 
   return(quantiles)
 }
 
-#' @name Neutrosophic Gamma
+#' @name Neutrosophic Generalized Pareto
 #' @export
-rnsGamma <- function(n, shape, scale) {
+rnsGenPareto <- function(n, shape, scale) {
   if (any(shape <= 0) || any(scale <= 0)) {
     stop(message = "Arguments are incompatible.")
   }
@@ -141,7 +139,7 @@ rnsGamma <- function(n, shape, scale) {
   shape <- rep(shape, length.out = 2)
   scale <- rep(scale, length.out = 2)
 
-  X <- qnsGamma(runif(n), shape, scale)
+  X <- qnsGenPareto(runif(n), shape, scale)
   condition <- X[, 1] > X[, 2]
   X[condition, 1:2] <- X[condition, 2:1]
 
