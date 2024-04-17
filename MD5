@@ -1,6 +1,6 @@
-074c7ffeb6afed4b59c0a49013efa489 *DESCRIPTION
+cd57fb579fe37e126c95ed5c202405d9 *DESCRIPTION
 56167869dc30d9c87c99c6a4b08f69c7 *NAMESPACE
-22fc34d12863da067086d1c69865168f *NEWS.md
+f8c6b5ef000dee2dd8aeb063aa79584b *NEWS.md
 1ebc0461d515bea8ca4e3113440a9858 *R/balls.R
 f8902143424a831367ea59a47a1386ad *R/nsDiscUnif.R
 53b95bc8bddb2af7433f95b223b023dd *R/nsGenExp.R
@@ -20,7 +20,7 @@ fb4ea9c23a20cc273ff84ef503444a4b *R/nsrayleigh.R
 14ed879f9ec740c2d249d0d58d586ddf *R/nsunif.R
 a09af566ae41f45e41c32e139c43f1b0 *R/nsweibull.R
 90ff9467cb7be23ad6fb88d0aa3e1e40 *R/remission.R
-91f4f1de51698834d55c0bbbaa6913b1 *README.md
+700970a5585b3ebbc033c413fa74fc2b *README.md
 ce65505c6eb8aa8cfcc32bf85b5ae9ef *data/balls.rda
 86c589b7ea74433b2c9658496e1e4afe *data/remission.rda
 c17081685a241ec3a96fd1c50126f1ad *man/Neutrosophic-Beta.Rd
